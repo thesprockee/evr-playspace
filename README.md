@@ -144,6 +144,8 @@ Jerk is the rate of change of acceleration, calculated as:
 
 Higher jerk values indicate rapid changes in movement patterns, which may indicate unnatural or "playspacing" behavior.
 
+**Note on Time Normalization**: The current implementation uses finite difference approximation without explicit time normalization, assuming uniform time steps between frames. For production use with variable frame rates, acceleration and jerk should be divided by the actual deltaTime between frames for physically accurate results.
+
 ### Anomaly Detection
 
 The IsolationForest algorithm is used because:

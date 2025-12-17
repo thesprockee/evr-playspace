@@ -59,6 +59,12 @@ type PlayerState struct {
 	HasPrevious  bool
 }
 
+// PlayerKey uniquely identifies a player in a session
+type PlayerKey struct {
+	SessionID string
+	UserID    string
+}
+
 // JerkRecord represents a row in the output parquet file
 type JerkRecord struct {
 	SessionID string  `parquet:"name=sessionid, type=BYTE_ARRAY, convertedtype=UTF8"`
@@ -69,7 +75,7 @@ type JerkRecord struct {
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
-	states := make(map[string]*PlayerState)
+	states := make(map[PlayerKey]*PlayerState)
 	var records []JerkRecord
 
 	// Read JSON lines from stdin
@@ -88,7 +94,7 @@ func main() {
 		// Process each player in each team
 		for _, team := range frame.Teams {
 			for _, player := range team.Players {
-				key := frame.SessionID + "+" + player.UserID
+				key := PlayerKey{SessionID: frame.SessionID, UserID: player.UserID}
 				state, exists := states[key]
 
 				if !exists {
@@ -102,9 +108,9 @@ func main() {
 				}
 
 				// Calculate acceleration from velocity change
-				// We'll use a simple finite difference approximation
-				// In a real scenario, we'd use deltaTime, but since we don't have it,
-				// we'll assume acceleration is proportional to velocity change
+				// Note: This is a finite difference approximation without time normalization.
+				// For proper physics calculations, this should be divided by deltaTime.
+				// The current implementation assumes uniform time steps between frames.
 				currentAccel := player.Velocity.Sub(state.LastVelocity)
 
 				if state.HasPrevious {

@@ -55,8 +55,13 @@ def train_isolation_forest(df):
     
     return df, model
 
-def plot_anomalies(df):
-    """Plot Jerk profiles with highlighted anomalies."""
+def plot_anomalies(df, max_users=5):
+    """Plot Jerk profiles with highlighted anomalies.
+    
+    Args:
+        df: DataFrame with jerk data and anomaly predictions
+        max_users: Maximum number of users to display in time series plot (default: 5)
+    """
     print("\nGenerating plots...")
     
     # Get anomalies
@@ -82,8 +87,8 @@ def plot_anomalies(df):
     # Plot 2: Time series of Jerk with anomalies highlighted
     ax2 = axes[1]
     
-    # For time series, we'll plot each user separately (limiting to first few for clarity)
-    unique_users = df.select("userid").unique().to_series().to_list()[:5]
+    # For time series, we'll plot each user separately (limiting for clarity)
+    unique_users = df.select("userid").unique().to_series().to_list()[:max_users]
     
     colors = plt.cm.tab10(range(len(unique_users)))
     
